@@ -651,7 +651,7 @@ FixedwingEstimator::check_filter_state()
 		rep.timeout_flags |= (((uint8_t)ekf_report.hgtTimeout)	<< 2);
 		rep.timeout_flags |= (((uint8_t)ekf_report.imuTimeout)	<< 3);
 
-		if (_debug > 10) {
+		if (_debug > 20 || (_debug > 10 && check)) {
 
 			if (rep.health_flags < ((1 << 0) | (1 << 1) | (1 << 2) | (1 << 3))) {
 				warnx("health: VEL:%s POS:%s HGT:%s OFFS:%s",
@@ -668,6 +668,18 @@ FixedwingEstimator::check_filter_state()
 					((rep.timeout_flags & (1 << 2)) ? "HGT " : ""),
 					((rep.timeout_flags & (1 << 3)) ? "IMU " : ""));
 			}
+
+			printf("states:\n");
+			for (int i = 0; i < ekf_report.n_states; i++) {
+				printf("%8.4f ", (double)ekf_report.states[i]);
+				if (i > 0 && (i % 6 == 0)) {
+					printf("\n");
+				}
+			}
+			printf("\n");
+
+			warnx("measurements: gps v: %8.4f %8.4f %8.4f", (double)_gps.vel_n_m_s,
+				(double)_gps.vel_e_m_s, (double)_gps.vel_d_m_s);
 		}
 
 		// Copy all states or at least all that we can fit
